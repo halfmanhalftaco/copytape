@@ -1,0 +1,50 @@
+.TH COPYTAPE 5  "8 August 1986"
+.SH NAME
+copytape \- copytape intermediate data file format
+.SH DESCRIPTION
+.I copytape
+duplicates magtapes on single\-tape systems by making
+an intermediate copy of the tape in a disk file.
+This disk file has a special format that preserves
+the block boundaries and tape marks of the original
+physical tape.
+.PP
+Each block is preceded by a header identifying what
+sort of block it is.  In the case of data blocks,
+the length of the data is also given.  Each header is
+on a separate text line, followed by a newline character.
+.sp
+.TP 3
+CPTP:BLK \fInnnnnn\fP
+.ti -3
+\fIdata\fP\\n
+.sp
+A data block is identified by the keyword
+.IR BLK .
+The length of the block is given in a six\-character
+numeric field.  The field is zero\-padded on the left if
+less than six characters are needed.  The header is
+followed by a newline character.
+The original data follows.  The data may have any characters
+in it, since
+.I copytape
+uses a read(2) to extract it.
+The data is followed by a newline, to make the file easy
+to view with an editor.
+.TP 3
+CPTP:MRK
+A tape mark was encountered in the original tape.
+.TP 3
+CPTP:EOT
+When two consecutive tape marks are encountered,
+.I copytape
+treats the second as a logical end\-of\-tape.  On
+output, both MRK and EOT generate
+a physical tape mark.
+.I copytape
+stops processing after copying an EOT.
+.SH "SEE ALSO"
+mtio(4)
+.SH BUGS
+Some weird tapes may not use two consecutive tape marks
+as logical end\-of\-tape.
